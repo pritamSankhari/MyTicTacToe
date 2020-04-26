@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My Tic Tac Toe</title>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script> -->
+	<!-- <script type="text/javascript" src="sketch.js"></script> -->
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+	<!-- Popper JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+	<link rel = "icon" href ="icon1.png" type = "image/x-icon">
+	<style type="text/css">
+		
+		.container{
+			
+		}
+
+		.instruction{
+			text-align: center;
+			font-size: 25px;
+			font-family: consolas;
+			font-variant-caps: small-caps;
+			letter-spacing: 2px;
+
+		}
+
+		.symbol-option{
+			display: flex;
+			justify-content: center;
+		}
+
+		.symbol-option div{
+			font-size: 30px;
+			cursor: pointer;
+
+			width: 60px;
+			height: 50px;
+			text-align: center;
+			border-radius: 10px;
+		}
+
+		.symbol-option div:hover{
+
+			transition: .8s;
+			background-color: black;
+			color: white;
+			border-radius: 10px;
+		}
+
+		.main{
+			display: flex;
+			justify-content: center;
+			position: sticky;
+			top: 0;
+		}
+
+		.playboard{
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			width: 210px;
+			display: none;
+
+			
+		}
+		.playboard div{
+			/*border:1px solid black;*/
+			/*border-radius: 10px;*/
+			text-align: center;
+			cursor: pointer;
+			width: 70px;
+			height: 70px;
+			font-size: 40px;
+			font-family: tahoma;
+
+		}
+
+		#cell1{
+			border-right:5px solid black; 
+			border-bottom: 5px solid black;
+		}
+		#cell2{
+			border-right:5px solid black; 
+			border-bottom: 5px solid black;
+		}
+		#cell3{
+			border-bottom: 5px solid black;
+		}
+		#cell4{
+			border-right:5px solid black; 
+			border-bottom: 5px solid black;
+		}
+		#cell5{
+			border-right:5px solid black; 
+			border-bottom: 5px solid black;	
+		}
+		#cell6{
+			border-bottom: 5px solid black;		
+		}
+		#cell7{
+			border-right:5px solid black; 
+		}
+		#cell8{
+			border-right:5px solid black; 	
+		}
+
+		.status{
+			
+			font-size: 30px;
+			font-family: verdana;
+			font-variant-caps: small-caps;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="instruction">Click On The Symbol 'X' or 'O' To Start or Restart The Game</div>
+		<div class="symbol-option">
+			<div id="_cross">X</div>
+			<div id="_zero">O</div>
+		</div>
+		<br>
+		<div class="status">
+			
+		</div>
+		<div class="main">
+
+			<div class="playboard">
+
+				<div id="cell1"></div>
+				<div id="cell2"></div>
+				<div id="cell3"></div>
+				<div id="cell4"></div>
+				<div id="cell5"></div>
+				<div id="cell6"></div>
+				<div id="cell7"></div>
+				<div id="cell8"></div>
+				<div id="cell9"></div>
+				
+			</div>		
+		</div>
+
+		
+		
+	</div>
+
+	<script type="text/javascript">
+		
+		let playStatus =true;
+		const playboard = document.querySelector(".playboard")
+		const cells = document.querySelector(".playboard").children
+		// let
+
+
+		let cross = document.getElementById('_cross')
+		let zero = document.getElementById('_zero')
+
+
+
+
+		let possibleMoves = [0,1,2,3,4,5,6,7,8]
+		let humanMoves = []
+		let cpuMoves = []
+		let humanChoice = undefined
+		let cpuChoice = undefined
+
+
+		let checkWin = function(moves){
+			moves.sort();
+
+			if(moves.indexOf(0)>=0&&moves.indexOf(1)>=0&&moves.indexOf(2)>=0)	
+				return [0,1,2];
+			else if(moves.indexOf(0)>=0&&moves.indexOf(4)>=0&&moves.indexOf(8)>=0)
+				return [0,4,8];
+			else if(moves.indexOf(0)>=0&&moves.indexOf(3)>=0&&moves.indexOf(6)>=0)
+				return [0,3,6];
+			else if(moves.indexOf(1)>=0&&moves.indexOf(4)>=0&&moves.indexOf(7)>=0)
+				return [1,4,7];
+			else if(moves.indexOf(2)>=0&&moves.indexOf(4)>=0&&moves.indexOf(6)>=0)
+				return [2,4,6];
+			else if(moves.indexOf(2)>=0&&moves.indexOf(5)>=0&&moves.indexOf(8)>=0)
+				return [2,5,8];
+			else if(moves.indexOf(3)>=0&&moves.indexOf(4)>=0&&moves.indexOf(5)>=0)
+				return [3,4,5];
+			else if(moves.indexOf(6)>=0&&moves.indexOf(7)>=0&&moves.indexOf(8)>=0)
+				return [6,7,8];
+			return false;
+		}
+
+
+		let turn = undefined // turn = 'X' -> cross X , turn = 'O' -> zero O
+
+		let removePossibleMove = function(move){
+
+			let moveIndex = possibleMoves.indexOf(move)
+
+			if(moveIndex<0){
+				return false;
+			}
+
+			possibleMoves.splice(moveIndex,1); //splice(index of item to remove,no of items to remove)
+			return true;
+			
+			
+		}
+
+		let addToHumanMove = function(move){
+			humanMoves.push(move)
+		}
+
+		let addToCPUMove = function(move){
+			cpuMoves.push(move)
+		}
+
+		let getEvenMove = function(){
+			m = possibleMoves[Math.floor(Math.random()*possibleMoves.length)]
+
+			
+			while(true){
+
+				if(m%2==0){
+					return m;
+				}
+
+				m = possibleMoves[Math.floor(Math.random()*possibleMoves.length)]
+			}
+		}
+
+
+		let cpuPlay = function(){
+
+			if(!playStatus)
+				return
+
+			if(turn!==cpuChoice)
+				return false;
+			
+			// MAIN LOGIC
+			//-----------------
+
+			
+			for(let i=0;i<possibleMoves.length;i++){
+				
+				let h = humanMoves
+				let c = cpuMoves
+
+
+				combination = h.concat([possibleMoves[i]])
+				combination.sort();
+
+				// FOR ATTACK AND WIN
+				if(checkWin(c.concat([possibleMoves[i]]).sort())){
+					
+					j = possibleMoves[i];
+					break;
+				}
+
+				// FOR DEFEND
+				else if(checkWin(combination)){
+
+					console.log('Human win combination')
+					j = possibleMoves[i];
+					break;
+				}
+				
+				else j = -1; 
+
+			}	
+			// console.log(j)
+
+			// SPECIAL CASE
+
+			if(j<0){
+
+				if(possibleMoves.length==8&&cpuChoice=='O'&&possibleMoves.indexOf(4)>=0){
+					j=4;
+				}
+				else if(possibleMoves.length>=6){
+					j=getEvenMove();
+				}
+				
+				else j=possibleMoves[Math.floor(Math.random()*possibleMoves.length)];
+			}
+
+			// ----------------
+
+
+			updateCell(j,cpuChoice)
+			addToCPUMove(j)
+			removePossibleMove(j)
+
+			turn=humanChoice;
+		}
+
+		let humanPlay = function(move){
+
+			if(!playStatus)
+				return
+
+			removePossibleMove(move);
+			addToHumanMove(move)
+			
+			cells[move].textContent=humanChoice;
+			turn=cpuChoice;
+		}
+
+		let updateCell = function(i,symbol){
+
+			cells[i].textContent=symbol;
+		}
+
+		let resetCells = function(){
+			
+			for(let i=0;i<cells.length;i++){
+				cells[i].textContent="";
+				cells[i].style.backgroundColor='white';
+			}
+
+			let status = document.querySelector(".status")
+			status.textContent = ""
+
+		}
+
+		let showFinalResult = function(msg){
+			let status = document.querySelector(".status")
+
+			// playboard.style.display='none';
+
+			status.textContent = msg ;
+		}
+
+
+		for(let i=0;i<cells.length;i++){
+
+			cells[i].addEventListener('click',
+
+				function(){
+					// console.log(i);
+					// console.log(humanMoves);
+					
+					if(humanMoves.indexOf(i)<0&&cpuMoves.indexOf(i)<0){
+						
+						humanPlay(i);
+						
+
+						if(w=checkWin(humanMoves)){
+
+							cells[w[0]].style.backgroundColor='yellowgreen'
+							cells[w[1]].style.backgroundColor='yellowgreen'
+							cells[w[2]].style.backgroundColor='yellowgreen'
+
+							showFinalResult(humanChoice+' wins!');
+							playStatus=false
+							
+						}
+						else if(possibleMoves.length==0){
+							showFinalResult('Draw!')
+							playStatus=false
+						}
+						else cpuPlay();
+						
+						if(w=checkWin(cpuMoves)){
+							// console.log(cpuMoves)
+
+							cells[w[0]].style.backgroundColor='salmon'
+							cells[w[1]].style.backgroundColor='salmon'
+							cells[w[2]].style.backgroundColor='salmon'
+
+							showFinalResult(cpuChoice+' wins!');
+							playStatus=false
+							
+						}
+						else if(possibleMoves.length==0){
+							showFinalResult('Draw!')
+							playStatus=false
+						}
+					}
+					
+					
+					
+					j = Math.floor(Math.random()*possibleMoves.length)
+
+					
+				}
+			)
+		}
+
+		cross.addEventListener(
+			'click',
+			function(){
+
+				// INITIALIZATION
+				// -----------------
+				resetCells();
+				playStatus=true;
+				possibleMoves = [0,1,2,3,4,5,6,7,8]
+				humanMoves = []
+				cpuMoves = []
+				// -----------------
+				
+				turn=humanChoice='X';
+				cpuChoice='O';
+				playboard.style.display='grid';
+
+				zero.style.backgroundColor='white';
+				zero.style.color='black';
+
+				cross.style.backgroundColor='black';
+				cross.style.color='white';
+			}
+		)
+
+		zero.addEventListener(
+			'click',
+			function(){
+				// INITIALIZATION
+				// -----------------
+				resetCells();
+				playStatus=true;
+				possibleMoves = [0,1,2,3,4,5,6,7,8]
+				humanMoves = []
+				cpuMoves = []
+				// -----------------
+
+				humanChoice='O';
+				turn=cpuChoice='X';
+				playboard.style.display='grid';
+				
+				cross.style.backgroundColor='white';
+				cross.style.color='black';
+
+				zero.style.backgroundColor='black';
+				zero.style.color='white';
+
+				cpuPlay();
+			}
+		)
+	</script>
+	
+
+</body>
+</html>
